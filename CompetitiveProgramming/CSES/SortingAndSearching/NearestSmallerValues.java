@@ -6,10 +6,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.Stack;
 import java.util.StringTokenizer;
-import java.util.TreeMap;
 
-public class TrafficLights {
+public class NearestSmallerValues {
 	static class FastReader {
 		private static final int BUFFER_SIZE = 1 << 16;
 		private final DataInputStream din;
@@ -135,11 +135,12 @@ public class TrafficLights {
 			din.close();
 		}
 	}
-	static class Pair {
-		long x;
-		long y;
 
-		public Pair(long x, long y) {
+	static class Pair {
+		int x;
+		int y;
+
+		Pair(int x, int y) {
 			this.x = x;
 			this.y = y;
 		}
@@ -150,17 +151,21 @@ public class TrafficLights {
 	public static void main(String[] args) throws IOException {
 		FastReader sc = new FastReader();
 		PrintWriter output = new PrintWriter(System.out);
-		int x = sc.nextInt();
 		int n = sc.nextInt();
-		int[] lights = new int[n];
-		int ans =0;
-		TreeMap<Long,Pair> map = new TreeMap<>();
-
+		int[] arr = new int[n];
 		for (int i = 0; i < n; i++) {
-			long a = sc.nextInt();
-			long f = map.floorKey(a);
-			long c = map.ceilingKey(a); 
-			map.put(sc.nextLong(), new Pair(1,2));
+			arr[i] = sc.nextInt();
 		}
+		Stack<Integer> st = new Stack<>();
+		for (int i = 0; i < n; i++) {
+			while (!st.empty() && arr[st.peek()] >= arr[i])
+				st.pop();
+			if (!st.empty())
+				output.write(st.peek() + 1 + " ");
+			else
+				output.write(0 + " ");
+			st.push(i);
+		}
+		output.flush();
 	}
 }

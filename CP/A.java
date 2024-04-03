@@ -16,9 +16,11 @@ package CP;
  */
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.TreeSet;
 
 class A {
 	static class Pair {
@@ -114,44 +116,44 @@ class A {
 		return (ok(n / 3, m) || ok(2 * n / 3, m));
 	}
 
+	static int find(int x, ArrayList<Integer> v) {
+		int l = 0;
+		int r = v.size();
+		while (l < r) {
+			int mid = (l + r) >>> 1;
+			if (v.get(mid) > x)
+				r = mid;
+			else
+				l = mid + 1;
+		}
+		return l;
+	}
+
 //1 1 1 2 2 2
 	public static void main(String[] args) throws IOException {
 		Scanner sc = new Scanner(System.in);
 		StringBuilder str = new StringBuilder();
 		int tt = sc.nextInt();
 		for (int xx = 0; xx < tt; xx++) {
-			int[] idx = new int[10];
-			ArrayList<ArrayList<Integer>> map = new ArrayList<>();
-			char[] data = sc.next().toCharArray();
-			int m = sc.nextInt();
-			String l = sc.next();
-			String r = sc.next();
-			for (int i = 0; i < 10; i++)
-				map.add(new ArrayList<>());
-			for (int i = 0; i < data.length; i++) {
-				map.get(data[i] - '0').add(i);
-			}
-			int c = 0;
-			for (int i = 0; i < m; i++) {
-				for (int j = 0; j < 10; j++) {
-					while (idx[j] < map.get(j).size() && map.get(j).get(idx[j]) < c) {
-						idx[j]++;
-					}
+			int n = sc.nextInt();
+			Pair arr[] = new Pair[n];
+			for (int i = 0; i < n; i++)
+				arr[i] = new Pair(sc.nextInt(), sc.nextInt());
+			Arrays.sort(arr, (a, b) -> Integer.compare(a.x, b.x));
+			ArrayList<Integer> v = new ArrayList<>();
+			v.add(arr[0].y);
+			long ans = 0;
+			for (int i = 1; i < n; i++) {
+				int temp = arr[i].y;
+				if (temp > v.get(v.size() - 1)) {
+					v.add(temp);
+				} else {
+					int ind = find(temp, v);
+					ans += v.size() - ind;
+					v.add(ind, temp);
 				}
-				int p = c;
-				for (int j = l.charAt(i) - '0'; j <= r.charAt(i) - '0'; j++) {
-					if (idx[j] >= map.get(j).size()) {
-						p = data.length;
-					} else {
-						p = Math.max(p, map.get(j).get(idx[j]));
-					}
-				}
-				c = p + 1;
 			}
-			if (c - 1 >= data.length)
-				str.append("YES" + "\n");
-			else
-				str.append("NO" + "\n");
+			str.append(ans + "\n");
 		}
 		System.out.println(str);
 		sc.close();
