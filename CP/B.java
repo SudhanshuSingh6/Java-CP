@@ -2,7 +2,8 @@ package CP;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Scanner;
 
 //C. Minimize Distance
@@ -14,6 +15,18 @@ public class B {
 		public Pair(int x, int y) {
 			this.x = x;
 			this.y = y;
+		}
+	}
+
+	static class Triplet {
+		int x;
+		int y;
+		int z;
+
+		public Triplet(int x, int y, int z) {
+			this.x = x;
+			this.y = y;
+			this.z = z;
 		}
 	}
 
@@ -241,39 +254,67 @@ public class B {
 		int t = sc.nextInt();
 		for (int xx = 0; xx < t; xx++) {
 			int n = sc.nextInt();
-			int k = sc.nextInt();
-			Integer[] arr = new Integer[n];
-			for (int i = 0; i < n; i++) {
-				arr[i] = sc.nextInt();
+			int m = sc.nextInt();
+			char[][] adj = new char[n + 1][m + 1];
+			int[][] ad = new int[n + 2][m + 2];
+			Queue<Triplet> q = new LinkedList<>();
+			for (int i = 1; i <= n; i++) {
+				Arrays.fill(ad[i], Integer.MAX_VALUE);
+				String s = sc.next();
+				for (int j = 0; j < m; j++) {
+					if (s.charAt(j) == '0')
+						q.add(new Triplet(i, j + 1, 0));
+					adj[i][j + 1] = s.charAt(j);
+				}
 			}
-			if (n<=k ) {
-				for (int i : arr)
-					str.append(i + " ");
-			} else if (n < 2 * k) {
-				ArrayList<Integer> ar = new ArrayList<>();
-				for (int i = 0; i < n - k; i++) {
-					ar.add(arr[i]);
+
+			int[][] a = { { 0, 1 }, { 1, 0 }, { -1, 0 }, { 0, -1 } };
+			int ans = Integer.MIN_VALUE;
+			int c = 0;
+			while (!q.isEmpty()) {
+				c++;
+				Triplet u = q.peek();
+				Triplet p = q.poll();
+				for (int[] b : a) {
+					c++;
+					p.x += b[0];
+					p.y += b[1];
+					if (p.x == 0 || p.x > n) {
+						ad[p.x][p.y] = Math.min(ad[p.x][p.y], p.z);
+					} else if (p.y == 0 || p.y > m) {
+						ad[p.x][p.y] = Math.min(ad[p.x][p.y], p.z);
+					} else {
+						if (adj[p.x][p.y] != '0' && adj[p.x][p.y] != '2') {
+							ad[u.x][u.y] = Math.min(ad[u.x][u.y], p.z + 1);
+							q.add(new Triplet(p.x, p.y, p.z + 1));
+							adj[p.x][p.y] = '2';
+							System.out.println(p.x + " " + p.y + " " + p.z);
+						}
+					}
 				}
-				for (int i = n - 1; i >= k; i--) {
-					ar.add(arr[i]);
-				}
-				Collections.sort(ar);
-			
-				int j = 0;
-				for (j = 0; j < n - k; j++) {
-					str.append(ar.get(j) + " ");
-				}
-				for (int i = n - k; i < k; i++) {
-					str.append(arr[i] + " ");
-				}
-				for (; j < ar.size(); j++)
-					str.append(ar.get(j) + " ");
-			} else {
-				Arrays.sort(arr);
-				for (int i : arr)
-					str.append(i + " ");
 			}
-			str.append("\n");
+			for (int i = 1; i <= n; i++) {
+				for (int j = 1; j <= m; j++) {
+					System.out.print(adj[i][j] + " ");
+				}
+				System.out.println();
+			}
+
+			for (int i = 1; i <= n; i++)
+				System.out.println(Arrays.toString(ad[i]));
+			for (int i = 0; i <= n; i++) {
+				ans = Math.min(ans, ad[i][0]);
+			}
+			for (int i = 0; i <= n; i++) {
+				ans = Math.min(ans, ad[i][n - 1]);
+			}
+			for (int i = 0; i <= m; i++) {
+				ans = Math.min(ans, ad[0][i]);
+			}
+			for (int i = 0; i <= n; i++) {
+				ans = Math.min(ans, ad[m - 1][i]);
+			}
+			str.append(ans + "\n");
 		}
 		System.out.println(str);
 		sc.close();

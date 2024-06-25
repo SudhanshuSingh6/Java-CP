@@ -148,7 +148,7 @@ public class HighScore {
 		}
 		dist[0] = 0;
 		boolean ok;
-		for (int i = 1; i < n; i++) {
+		for (int i = 1; i <= n; i++) {
 			ok = false;
 			for (int j = 0; j < m; j++) {
 				int u = adj.get(j).x;
@@ -166,7 +166,7 @@ public class HighScore {
 			if (!ok)
 				break;
 		}
-		for (int i = 1; i < n; i++) {
+		for (int i = 1; i <= n; i++) {
 			ok = false;
 			for (int j = 0; j < m; j++) {
 				int u = adj.get(j).x;
@@ -183,6 +183,7 @@ public class HighScore {
 			if (!ok)
 				break;
 		}
+
 		if (dist[n - 1] == NINF)
 			System.out.println(-1);
 		else {

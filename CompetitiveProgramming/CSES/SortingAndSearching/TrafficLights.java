@@ -1,4 +1,4 @@
-package CompetitiveProgramming.CSES.SortingAndSearching;
+//package CompetitiveProgramming.CSES.SortingAndSearching;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.PriorityQueue;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
 
@@ -135,11 +136,12 @@ public class TrafficLights {
 			din.close();
 		}
 	}
-	static class Pair {
-		long x;
-		long y;
 
-		public Pair(long x, long y) {
+	static class Pair {
+		int x;
+		int y;
+
+		public Pair(int x, int y) {
 			this.x = x;
 			this.y = y;
 		}
@@ -153,14 +155,44 @@ public class TrafficLights {
 		int x = sc.nextInt();
 		int n = sc.nextInt();
 		int[] lights = new int[n];
-		int ans =0;
-		TreeMap<Long,Pair> map = new TreeMap<>();
-
+		TreeMap<Integer, Pair> map = new TreeMap<>();
+		TreeMap<Integer, Integer> cnt = new TreeMap<>();
+		map.put(0, new Pair(0, x));
+		map.put(x, new Pair(x, 0));
+		PriorityQueue<Integer> pq = new PriorityQueue<>();
+		pq.add(-x);
+		pq.add(-x);
+		// pq.add(-0);
 		for (int i = 0; i < n; i++) {
-			long a = sc.nextInt();
-			long f = map.floorKey(a);
-			long c = map.ceilingKey(a); 
-			map.put(sc.nextLong(), new Pair(1,2));
+			int a = sc.nextInt();
+			int f = map.floorKey(a);
+			int c = map.ceilingKey(a);
+			// System.out.println(i + " " + a + " " + f + " " + c);
+			int l = a - f;
+			int r = c - a;
+			// map.put(a, new Pair(l, r));
+			// System.out.println(-map.get(f).y + " " + -map.get(c).x);
+			// if (pq.contains(-map.get(f).y))
+			// pq.remove(-map.get(f).y);
+			cnt.put(map.get(f).y, cnt.get(map.get(f).y) - 1);
+			// if (pq.contains(-map.get(c).x))
+			// pq.remove(-map.get(c).x);
+			cnt.put(map.get(c).x, cnt.get(map.get(c).x) - 1);
+			map.put(f, new Pair(map.get(f).x, l));
+			map.put(c, new Pair(r, map.get(c).y));
+			map.put(a, new Pair(l, r));
+			// System.out.println(l+" "+r);
+			cnt.put(l, cnt.getOrDefault(l, 0) + 1);
+			cnt.put(r, cnt.getOrDefault(l, 0) + 1);
+			//pq.add(-r);
+			pq.add(-map.get(f).x);
+			pq.add(-map.get(c).x);
+			// System.out.println(pq);
+			// pq.remove(0);
+			// for (int j : map.keySet())
+			// System.out.println(j + " " + map.get(j).x + " " + map.get(j).y);
+			output.write(-pq.peek() + "\n");
 		}
+		output.flush();
 	}
 }

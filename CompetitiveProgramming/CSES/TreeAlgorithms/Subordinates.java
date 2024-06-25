@@ -1,11 +1,11 @@
-package CompetitiveProgramming.CSES.TreeAlgorithms;
+//package CompetitiveProgramming.CSES.TreeAlgorithms;
 
-import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.*;
+import java.io.PrintWriter;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Subordinates {
 	static class Reader {
@@ -119,32 +119,43 @@ public class Subordinates {
 		}
 	}
 
-	static void subtree(int s, int p, Vector<Vector<Integer>> adj, int[] cnt) {
-		cnt[s]++;
-		for (int i : adj.get(s)) {
-			if (i == p)
-				continue;
-			subtree(i, s, adj, cnt);
-			cnt[s] += cnt[i];
-		}
+	static void subtree(int s) {
+
 	}
 
+	static int[] parent;
+	static int[] cnt;
+
 	public static void main(String[] args) throws IOException {
-		BufferedWriter output = new BufferedWriter(new OutputStreamWriter(System.out));
+		PrintWriter output = new PrintWriter(System.out);
 		Reader sc = new Reader();
 		int n = sc.nextInt();
-		Vector<Vector<Integer>> adj = new Vector<>();
-		for (int i = 0; i < n; i++) {
-			adj.add(new Vector<>());
-		}
+		cnt = new int[n];
+		parent = new int[n];
+		parent[0] = -1;
 		for (int i = 1; i < n; i++) {
-			int a = sc.nextInt();
-			adj.get(a - 1).add(i);
+			parent[i] = sc.nextInt() - 1;
 		}
-		int[] cnt = new int[n];
-		subtree(0, -1, adj, cnt);
+		int[] indegree = new int[n];
+		for (int i = 1; i < n; i++)
+			indegree[parent[i]]++;
+		Queue<Integer> q = new LinkedList<>();
+		for (int i = 1; i < n; i++) {
+			if (indegree[i] == 0)
+				q.add(i);
+		}
+		while (!q.isEmpty()) {
+			int emp = q.poll();
+			if (parent[emp] == -1)
+				break;
+			cnt[parent[emp]] += cnt[emp] + 1;
+			indegree[parent[emp]]--;
+			if (indegree[parent[emp]] == 0) {
+				q.add(parent[emp]);
+			}
+		}
 		for (int i : cnt)
-			output.append(i - 1 + " ");
+			output.append(i + " ");
 		output.flush();
 		sc.close();
 	}

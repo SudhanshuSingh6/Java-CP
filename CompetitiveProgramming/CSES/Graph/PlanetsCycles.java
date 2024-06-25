@@ -1,21 +1,18 @@
-package CompetitiveProgramming.CSES.DynamicProgramming;
+//package CompetitiveProgramming.CSES.Graph;
 
-import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.StringTokenizer;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
-public class ArrayDescription {
+public class PlanetsCycles {
 	static class FastReader {
 		private static final int BUFFER_SIZE = 1 << 16;
 		private final DataInputStream din;
 		private final byte[] buffer;
 		private int bufferPointer, bytesRead;
-		StringTokenizer st;
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
 		FastReader() {
 			din = new DataInputStream(System.in);
@@ -29,15 +26,16 @@ public class ArrayDescription {
 			bufferPointer = bytesRead = 0;
 		}
 
-		public String next() {
-			while (st == null || !st.hasMoreElements()) {
-				try {
-					st = new StringTokenizer(br.readLine());
-				} catch (IOException e) {
-					e.printStackTrace();
+		public String readLine() throws IOException {
+			final byte[] buf = new byte[1024]; // line length
+			int cnt = 0, c;
+			while ((c = read()) != -1) {
+				if (c == '\n') {
+					break;
 				}
+				buf[cnt++] = (byte) c;
 			}
-			return st.nextToken();
+			return new String(buf, 0, cnt);
 		}
 
 		public int nextInt() throws IOException {
@@ -113,16 +111,6 @@ public class ArrayDescription {
 			}
 		}
 
-		String nextLine() {
-			String str = "";
-			try {
-				str = br.readLine();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			return str;
-		}
-
 		private byte read() throws IOException {
 			if (bufferPointer == bytesRead) {
 				fillBuffer();
@@ -135,30 +123,49 @@ public class ArrayDescription {
 		}
 	}
 
-	static int MOD = (int) 1e9 + 7;
+	static void dfs(int s) {
+		path.addLast(s);
+		if (vis[s]) {
+			steps += ans[s];
+			return;
+		}
+		vis[s] = true;
+		steps++;
+		dfs(destination[s]);
+	}
+
+	static boolean[] vis;
+	static int[] destination;
+	static Deque<Integer> path = new ArrayDeque<>();
+	static int[] ans;
+	static int steps = 0;
 
 	public static void main(String[] args) throws IOException {
 		FastReader sc = new FastReader();
 		PrintWriter output = new PrintWriter(System.out);
 		int n = sc.nextInt();
-		int m = sc.nextInt();
-		int[] nums = new int[n];
-		for (int i = 0; i < n; i++)
-			nums[i] = sc.nextInt();
-		int[][] dp = new int[n][m];
-		for (int i = 1; i <= m; i++) {
-			if (nums[0] == i || nums[0] == 0)
-				dp[1][i] = 1;
-		}
+		destination = new int[n];
 		for (int i = 0; i < n; i++) {
-			for (int k = 2; k <= m; k++) {
-				if (nums[i - 1] != 0 && nums[i - 1] != k) {
-					dp[i][k] = 0;
-					continue;
+			destination[i] = sc.nextInt() - 1;
+		}
+		vis = new boolean[n];
+		ans = new int[n];
+		for (int i = 0; i < n; i++) {
+			if (!vis[i]) {
+				steps = 0;
+				dfs(i);
+				int decrement = 1;
+				while (!path.isEmpty()) {
+					if (path.getFirst() == path.getLast())
+						decrement = 0;
+					ans[path.getFirst()] = steps;
+					steps -= decrement;
+					path.pollFirst();
 				}
 			}
 		}
+		for (int i : ans)
+			output.write(i + " ");
 		output.flush();
-		sc.close();
 	}
 }
